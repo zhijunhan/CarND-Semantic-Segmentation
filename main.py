@@ -222,7 +222,7 @@ def run():
         # Epoch
         epochs = 10
         # Batch size
-        batch_size = 5
+        batch_size = 1
         # Create placeholder for TF variables
         label = tf.placeholder(tf.int32, shape=[None, None, None, num_classes])
         learning_rate = tf.placeholder(tf.float32)
