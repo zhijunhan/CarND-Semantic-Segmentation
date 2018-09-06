@@ -168,20 +168,14 @@ def run():
         saver.restore(sess, './runs/sem_seg_model.ckpt')
 
         sess.run(tf.global_variables_initializer())
-        train_nn(sess, epochs, batches, get_batches_fn, train_op, loss,
+        train_nn(sess, 30, 4, get_batches_fn, train_op, loss,
                 input_image, label, keep_prob, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
 
         # OPTIONAL: Apply the trained model to a video
-        data_sub_dir = 'project_video'
-        helper.save_to_clip(data_sub_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
 
-        data_sub_dir = 'challenge_video'
-        helper.save_to_clip(data_sub_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
-
-        saver.restore(sess, './runs/sem_seg_model.ckpt')
 
 if __name__ == '__main__':
     run()
