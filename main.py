@@ -59,7 +59,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     """
     # TODO: Implement function
     # To implement encoder for FCN-8 architucture.
-	# As NN model will be used for identifying road pixels with 2 categorials: road and not road
+    # As NN model will be used for identifying road pixels with 2 categorials: road and not road
     init = tf.truncated_normal_initializer(stddev = 0.01)
     reg = tf.contrib.layers.l2_regularizer(1e-3)
 
@@ -72,7 +72,7 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     conv7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='same', kernel_initializer=init, kernel_regularizer=reg)
 
     # Upsample the 1x1 encoded layer to its original image size
-	# Transpose layer will be (batch_size, original_height, original_weight, num_classes)
+    # Transpose layer will be (batch_size, original_height, original_weight, num_classes)
     transp1 = tf.layers.conv2d_transpose(conv7, num_classes, 4, strides=(2,2), padding='same', kernel_initializer=init, kernel_regularizer=reg)
 
     skip1 = tf.add(transp1, conv4)
@@ -105,11 +105,11 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
     cross_entropy_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=logits, labels=labels))
 
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
-	
+    
     train_op = optimizer.minimize(cross_entropy_loss)
 
     return logits, train_op, cross_entropy_loss
-	
+    
 tests.test_optimize(optimize)
 
 
@@ -165,14 +165,14 @@ def run():
         #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         # TODO: Build NN using load_vgg, layers, and optimize function
-		# Epoch
+        # Epoch
         epochs = 30
         # Batch size
         batch_size = 5
         # Create placeholder for TF variables
         label = tf.placeholder(tf.int32, shape=[None, None, None, num_classes])
         learning_rate = tf.placeholder(tf.float32)
-		
+        
         # Obtain VGG model
         input_image, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(sess, vgg_path)
         # Create FCN
@@ -180,7 +180,7 @@ def run():
         # Get logits, training operation and cross entropy
         logits, train_op, loss = optimize(final_layer, label, learning_rate, num_classes)
         # TODO: Train NN using the train_nn function
-		
+        
         train_nn(sess, epochs, batch_size, get_batches_fn, train_op, loss,
                 input_image, label, keep_prob, learning_rate)
 
@@ -190,10 +190,10 @@ def run():
         # OPTIONAL: Apply the trained model to a video
 
         # Save trained model
-		model_saver = tf.train.Saver()
-		save_path = os.path.join(runs_dir, 'VGG_FCN_weight.ckpt')
-		model_saver.save(sess, save_path)
-		print('Trained model saved to: {}'.format(save_path))
+        model_saver = tf.train.Saver()
+        save_path = os.path.join(runs_dir, 'VGG_FCN_weight.ckpt')
+        model_saver.save(sess, save_path)
+        print('Trained model saved to: {}'.format(save_path))
 
 if __name__ == '__main__':
     run()
