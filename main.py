@@ -124,12 +124,12 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param learning_rate: TF Placeholder for learning rate
     """
     # TODO: Implement function
-    for e in epochs:
+    for epoch in range(epochs):
         for i, (img, label) in enumerate(get_batches_fn(batch_size)):
             _, loss = sess.run([train_op, cross_entropy_loss],
-                                feed_dict={input_image:img, correct_label:label, keep_prob:0.375})
+                                feed_dict={input_image:img, correct_label:label, keep_prob:0.375, learning_rate:1e-4})
 
-    print("Epoch: {}\tBatch: {}\tLoss: {}".format(e+1, i, loss))
+    print("Epoch: {}\tBatch: {}\tLoss: {}".format(epoch, i, loss))
 tests.test_train_nn(train_nn)
 
 
