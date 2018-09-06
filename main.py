@@ -220,9 +220,9 @@ def run():
 
         # TODO: Build NN using load_vgg, layers, and optimize function
         # Epoch
-        epochs = 2
+        epochs = 5
         # Batch size
-        batch_size = 1
+        batch_size = 5
         # Create placeholder for TF variables
         label = tf.placeholder(tf.int32, shape=[None, None, None, num_classes])
         learning_rate = tf.placeholder(tf.float32)
