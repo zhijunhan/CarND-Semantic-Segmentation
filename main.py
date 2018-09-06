@@ -163,9 +163,9 @@ def run():
         learning_rate = tf.placeholder(tf.float32)
         logits, train_op, loss = optimize(final_layer, label, learning_rate, num_classes)
         # TODO: Train NN using the train_nn function
-        saver = tf.train.Saver()
+        #saver = tf.train.Saver()
 
-        saver.restore(sess, './runs/sem_seg_model.ckpt')
+        #saver.restore(sess, './runs/sem_seg_model.ckpt')
 
         sess.run(tf.global_variables_initializer())
         train_nn(sess, 30, 4, get_batches_fn, train_op, loss,
