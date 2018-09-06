@@ -64,27 +64,81 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     reg = tf.contrib.layers.l2_regularizer(1e-3)
 
     # 1x1 convolution of the last VGG16 layer
-    conv3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='same', kernel_initializer=init, kernel_regularizer=reg)
+    conv7 = tf.layers.conv2d(vgg_layer7_out,
+                             num_classes, 1,
+                             padding='same',
+                             kernel_initializer=init,
+                             kernel_regularizer=reg)
 
-    conv4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='same', kernel_initializer=init, kernel_regularizer=reg)
+    # Upsample the 1x1 encoded layer to original image size
+    # Transposed layer will be (batch_size, original_height, original_width, numn_classes)
+    transp1 = tf.layers.conv2d_transpose(conv7,
+                                         num_classes, 4,
+                                         strides=(2,2),
+                                         padding='same',
+                                         kernel_initializer=init,
+                                         kernel_regularizer=reg)
 
-    # 1x1 convolution of the VGG16 layer 7
-    conv7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='same', kernel_initializer=init, kernel_regularizer=reg)
+    # 1x1 convolution of VGG16 layer 4
+    conv4 = tf.layers.conv2d(vgg_layer4_out,
+                             num_classes, 1,
+                             padding='same',
+                             kernel_initializer=init,
+                             kernel_regularizer=reg)
 
-    # Upsample the 1x1 encoded layer to its original image size
-    # Transpose layer will be (batch_size, original_height, original_weight, num_classes)
-    transp1 = tf.layers.conv2d_transpose(conv7, num_classes, 4, strides=(2,2), padding='same', kernel_initializer=init, kernel_regularizer=reg)
-
+    # Perform skip connections
     skip1 = tf.add(transp1, conv4)
 
-    transp2 = tf.layers.conv2d_transpose(skip1, num_classes, 4, 2, padding='same', kernel_initializer=init, kernel_regularizer=reg)
+    # Upsample the output of skip connection layer
+    transp2 = tf.layers.conv2d_transpose(skip1,
+                                         num_classes, 4,
+                                         strides=(2,2),
+                                         padding='same',
+                                         kernel_initializer=init,
+                                         kernel_regularizer=reg)
 
+    # 1x1 convolution of VGG layer 3
+    conv3 = tf.layers.conv2d(vgg_layer3_out,
+                             num_classes, 1,
+                             padding='same',
+                             kernel_initializer=init,
+                             kernel_regularizer=reg)
+
+    # Perform skip connection
     skip2 = tf.add(transp2, conv3)
 
-    output = tf.layers.conv2d_transpose(skip2, num_classes, 16, 8, padding='same',
-                                        kernel_initializer=init, kernel_regularizer=reg)
+    # Upsample 
+    last_layer = tf.layers.conv2d_transpose(skip2,
+                                            num_classes, 16,
+                                            strides=(8,8),
+                                            padding='same',
+                                            kernel_initializer=init,
+                                            kernel_regularizer=reg)
 
-    return output
+
+
+#    conv3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='same', kernel_initializer=init, kernel_regularizer=reg)#
+
+#    conv4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='same', kernel_initializer=init, kernel_regularizer=reg)#
+
+#    # 1x1 convolution of the VGG16 layer 7
+#    conv7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='same', kernel_initializer=init, kernel_regularizer=reg)#
+
+#    # Upsample the 1x1 encoded layer to its original image size
+#    # Transpose layer will be (batch_size, original_height, original_weight, num_classes)
+#    transp1 = tf.layers.conv2d_transpose(conv7, num_classes, 4, strides=(2,2), padding='same', kernel_initializer=init, kernel_regularizer=reg)#
+
+#    skip1 = tf.add(transp1, conv4)#
+
+#    transp2 = tf.layers.conv2d_transpose(skip1, num_classes, 4, 2, padding='same', kernel_initializer=init, kernel_regularizer=reg)#
+
+#    skip2 = tf.add(transp2, conv3)#
+
+#    output = tf.layers.conv2d_transpose(skip2, num_classes, 16, 8, padding='same',
+#                                        kernel_initializer=init, kernel_regularizer=reg)
+
+    return last_layer
+
 tests.test_layers(layers)
 
 
@@ -166,7 +220,7 @@ def run():
 
         # TODO: Build NN using load_vgg, layers, and optimize function
         # Epoch
-        epochs = 30
+        epochs = 10
         # Batch size
         batch_size = 5
         # Create placeholder for TF variables
